@@ -9,6 +9,7 @@ import { OMDbMovie, OMDbSearchRequest } from '@services/models/omdbTypes';
 import { OmdbApiService } from '@services/omdb-api.service';
 import { SearchService } from '@services/search.service';
 import { TmdbMovie } from '@services/models/tmdbTypes';
+import { FavoritesService } from '@services/favorites.service';
 
 @Component({
   selector: 'content-search',
@@ -24,12 +25,12 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
   totalPages: number = 1;
   private searchSubscription!: Subscription;
   emailLogado: string = ''; 
-  favoriteMovies: string[] = []; 
 
   constructor(
     private tmdbService: TmdbService,
     private omdbService: OmdbApiService,
     private searchService: SearchService,
+    private favoritesService: FavoritesService, // Serviço para gerenciar favoritos
     private route: ActivatedRoute
   ) {}
 
@@ -55,13 +56,21 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   loadFavorites(): void {
     if (this.emailLogado) {
-      const favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
-      this.favoriteMovies = favoritos[this.emailLogado] || [];
-      this.movies = this.parseFavoriteMovies(this.favoriteMovies); 
-      this.loading = false; 
+      this.loading = true;
+      this.favoritesService.getFavorites(this.emailLogado).subscribe({
+        next: (favorites) => {
+          this.movies = this.parseFavoriteMovies(favorites); 
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Erro ao buscar favoritos do servidor:', error);
+          this.movies = [];
+          this.loading = false;
+        },
+      });
     }
   }
 
@@ -150,8 +159,8 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     }));
   }
 
-  parseFavoriteMovies(response: any): OMDbMovie[] {
-    return response.map((movie: any) => ({
+  parseFavoriteMovies(favorites: OMDbMovie[]): OMDbMovie[] {
+    return favorites.map<any>((movie) => ({
       title: movie.Title,
       release_date: movie.Year,
       poster_path: movie.Poster !== 'N/A' ? movie.Poster : 'na-movie.png',

@@ -74,3 +74,74 @@ app.post('/create', (req, res) => {
     res.status(500).json({ message: 'Erro ao salvar usuário.' });
   }
 });
+
+const favoritosPath = path.resolve(__dirname, './database/favoritos.json');
+let dbFavoritos = require(favoritosPath);
+
+// Helper function to save favorites changes
+function saveFavoritos() {
+  fs.writeFileSync(favoritosPath, JSON.stringify(dbFavoritos, null, 2));
+}
+
+// Get user favorites
+app.get('/favorites', (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email não fornecido.' });
+  }
+
+  const favoritos = dbFavoritos[email] || [];
+  res.status(200).json(favoritos);
+});
+
+// Add a favorite
+app.put('/favorites', (req, res) => {
+  const { email, movie } = req.body;
+
+  if (!email || !movie) {
+    return res.status(400).json({ message: 'Email ou filme não fornecido.' });
+  }
+
+  if (!dbFavoritos[email]) {
+    dbFavoritos[email] = [];
+  }
+
+  const alreadyExists = dbFavoritos[email].some((fav) => fav.imdbID === movie.imdbID);
+  if (alreadyExists) {
+    return res.status(409).json({ message: 'Filme já está nos favoritos.' });
+  }
+
+  dbFavoritos[email].push(movie);
+
+  try {
+    saveFavoritos();
+    res.status(200).json({ message: 'Filme adicionado aos favoritos.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erro ao salvar favorito.' });
+  }
+});
+
+// Remove a favorite
+app.delete('/favorites', (req, res) => {
+  const { email, imdbID } = req.body;
+
+  if (!email || !imdbID) {
+    return res.status(400).json({ message: 'Email ou imdbID não fornecido.' });
+  }
+
+  if (!dbFavoritos[email]) {
+    return res.status(404).json({ message: 'Usuário não possui favoritos.' });
+  }
+
+  dbFavoritos[email] = dbFavoritos[email].filter((fav) => fav.imdbID !== imdbID);
+
+  try {
+    saveFavoritos();
+    res.status(200).json({ message: 'Filme removido dos favoritos.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erro ao remover favorito.' });
+  }
+});
