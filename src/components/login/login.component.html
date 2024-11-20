@@ -1,0 +1,17 @@
+<div class="container d-flex align-items-center justify-content-center vh-100">
+  <div class="card shadow p-4 text-center" style="width: 400px;">
+    <h2 class="text-center mb-4">Login</h2>
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label text-start w-100">E-mail</label>
+        <input type="email" class="form-control text-start" id="email" [(ngModel)]="email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label text-start w-100">Senha</label>
+        <input type="password" class="form-control text-start" id="password" [(ngModel)]="password" name="password" required>
+      </div>
+      <p class="text-primary text-end mb-2" style="cursor: pointer;" (click)="navigateToSignUp()">Não tem conta?</p>
+      <button type="submit" class="btn btn-primary w-100">Entrar</button>
+    </form>
+  </div>
+</div> 

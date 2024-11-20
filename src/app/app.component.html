@@ -1,0 +1,23 @@
+<lib-toastify-toast-container
+  [position]="'top-right'"
+  [autoClose]="3000"
+  [hideProgressBar]="false"
+  [newestOnTop]="true"
+  [closeOnClick]="true"
+  [pauseOnHover]="true"
+></lib-toastify-toast-container>
+
+
+<div *ngIf="loading" class="container-base text-center">
+  <div class="spinner-grow text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<ng-container *ngIf="!loading">
+  <navbar *ngIf="!isLoginOrSignup()"></navbar>
+  <main style="background-color: #1f2937">
+    <router-outlet></router-outlet>
+  </main>
+  <footer *ngIf="!isLoginOrSignup()"></footer>
+</ng-container>

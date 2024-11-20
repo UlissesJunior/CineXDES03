@@ -1,0 +1,44 @@
+<div *ngIf="loading" class="container-base">
+  <div class="spinner-grow text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!loading && movies.length > 0" class="container-content">
+  <div>
+    <movie-cards [movies]="movies"></movie-cards>
+    <nav *ngIf="totalPages > 1" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+        </li>
+        
+        <li *ngIf="currentPage > 3" class="page-item">
+          <button class="page-link" (click)="onPageChange(1)">1</button>
+        </li>
+        <li *ngIf="currentPage > 4" class="page-item disabled">
+          <button class="page-link">...</button>
+        </li>
+        
+        <li *ngFor="let page of getPagesToShow()" class="page-item" [class.active]="currentPage === page">
+          <button class="page-link" (click)="onPageChange(page)">{{ page }}</button>
+        </li>
+
+        <li *ngIf="currentPage < totalPages - 3" class="page-item disabled">
+          <button class="page-link">...</button>
+        </li>
+        <li *ngIf="currentPage < totalPages - 2" class="page-item">
+          <button class="page-link" (click)="onPageChange(totalPages)">{{ totalPages }}</button>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Próxima</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<div *ngIf="movies.length === 0" class="container-base">
+  <p>Nenhum filme encontrado.</p>
+</div>

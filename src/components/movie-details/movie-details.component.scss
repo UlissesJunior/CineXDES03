@@ -1,0 +1,140 @@
+.movie-details {
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .actors-list {
+    display: flex;
+    gap: 10px;
+
+    .actor-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80px;
+
+      .actor-photo {
+        width: 60px;
+        height: 60px;
+        background-color: #ddd;
+        border-radius: 50%;
+      }
+
+      .actor-name {
+        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+
+  .favorite-button-container { 
+    display: flex;
+    justify-content: left;
+  }
+
+  .favorite-button {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    margin-top: 1.5rem;
+    background-color: white;
+    border: 2px solid #ccc;
+    color: black;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+.movie-poster {
+  position: relative;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .rating {
+    position: absolute;
+    top: 50%;
+    left: -40px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+
+    .stars {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 2.5rem;
+
+      .star {
+        color: #ffc107;
+        // font-size: 2rem;
+      }
+    }
+  }
+}
+
+.container-base {
+  padding: 1rem;
+}
+
+.movie-description {
+  text-align: justify;
+}
+
+.movie-details {
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 60%;
+  }
+}
+
+.movie-poster {
+  width: 100%;
+  
+  @media (min-width: 768px) {
+    width: 40%;
+  }
+}
+
+.actor-card {
+  margin: 0.5rem;
+}
+
+.favorite-button-container {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+@media ((min-width: 320px) and (max-width: 1024px)) {
+  .container-base {
+    flex-direction: row;
+    align-items: flex-start;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .movie-details {
+    width: 60%;
+    margin-bottom: 0;
+  }
+
+  .movie-poster {
+    width: 40%;
+    text-align: right;
+  }
+
+}

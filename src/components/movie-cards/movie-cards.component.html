@@ -1,0 +1,28 @@
+<div class="movie-grid">
+  <div class="movie-card" *ngFor="let movie of movies">
+    <div class="movie-card-shadow"></div>
+    <img *ngIf="movie.poster_path != 'N/A'" [src]="movie.poster_path" alt="{{ movie.title }}">
+    <img *ngIf="movie.poster_path == 'N/A'" src="na-movie.png" alt="{{ movie.title }}">
+    <div class="movie-info">
+      <div class="release-date">{{ movie.release_date | date: 'MMM d, yyyy' }}</div>
+      <h2>{{ movie.title }}</h2>
+      <a [routerLink]="['/movie', movie.title]">Detalhes</a>
+    </div>
+  </div>
+</div>
+
+<nav *ngIf="totalPages > 1">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <button class="page-link" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+    </li>
+
+    <li *ngFor="let page of [].constructor(totalPages); let i = index" class="page-item" [class.active]="currentPage === i + 1">
+      <button class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</button>
+    </li>
+
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <button class="page-link" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages">Próxima</button>
+    </li>
+  </ul>
+</nav>

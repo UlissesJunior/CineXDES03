@@ -1,0 +1,60 @@
+<div class="container d-flex align-items-center justify-content-center vh-100">
+  <div class="card shadow p-4 text-center" style="width: 400px">
+    <h2 class="text-center mb-4 ">Cadastre-se</h2>
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <div class="position-relative d-flex justify-content-center">
+          <img
+            *ngIf="photoPreview"
+            [src]="photoPreview"
+            alt="Profile Photo"
+            class="rounded-circle mb-3"
+            width="100"
+            height="100"
+            style="object-fit: cover; cursor: pointer"
+            (click)="triggerFileInput()"
+          />
+          <div
+            *ngIf="!photoPreview"
+            class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+            (click)="triggerFileInput()"
+            style="width: 100px; height: 100px; cursor: pointer"
+          >
+            <span class="text-white">Upload</span>
+          </div>
+          <!-- Hidden file input -->
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileChange($event)"
+            accept="image/*"
+            style="display: none"
+          />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label w-100 text-start">Nome</label>
+        <input
+          type="text"
+          class="form-control text-start"
+          id="name"
+          [(ngModel)]="name"
+          name="name"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label w-100 text-start">E-mail</label>
+        <input
+          type="email"
+          class="form-control text-start"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+    </form>
+  </div>
+</div>
