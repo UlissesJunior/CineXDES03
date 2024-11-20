@@ -14,7 +14,11 @@ export class AuthenticatorService {
     return this.http.post(`${this.apiUrl}/login`, { email, password });
   }
 
-  signUp(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/create`, { username, email, password });
-  }
+  signUp(user: { username: string; email: string; password: string; photo: string | null }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/create`, user);
+  }  
+
+  getUserByEmail(email: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user`, { params: { email } });
+  }  
 }

@@ -12,16 +12,16 @@
       />
     </div>
     <div class="profile" (click)="toggleDropdown()">
-      <img [src]="usuarioImagem?.photo" alt="User Avatar" class="avatar" />
+      <img [src]="usuarioImagem" alt="User Avatar" class="avatar" />
       <div class="dropdown-menu" [class.show]="isDropdownVisible">
         <div class="dropdown-header">
           <img
-            [src]="usuarioImagem?.photo"
+            [src]="usuarioImagem"
             alt="User Avatar"
             class="dropdown-avatar"
           />
           <div class="text-wrap" style="max-width: 120px;">
-            <span class="text-truncate">{{ usuarioImagem?.nome }}</span>
+            <span class="text-truncate">{{ usuarioNome }}</span>
           </div>
         </div>
         <a (click)="signOut()" class="dropdown-item">Sign out</a>

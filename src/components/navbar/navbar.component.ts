@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import { SearchService } from '@services/search.service';
+import { AuthenticatorService } from '@services/authenticator.service';
 
 @Component({
   selector: 'navbar',
@@ -18,11 +19,13 @@ export class NavbarComponent implements AfterViewInit {
   isMenuVisible = false;
   private searchTextChanged = new Subject<string>();
   usuarioImagem: any = null;
+  usuarioNome: string = '';
   searchText: string = '';
 
   constructor(
     private searchService: SearchService,
     private router: Router,
+    private authService: AuthenticatorService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.searchTextChanged.pipe(debounceTime(500)).subscribe((searchText) => {
@@ -34,7 +37,7 @@ export class NavbarComponent implements AfterViewInit {
     });
 
     if (isPlatformBrowser(this.platformId)) {
-      this.usuarioImagem = this.getImagemUsuario();
+      this.getImagemUsuario();
     }
   }
 
@@ -53,17 +56,24 @@ export class NavbarComponent implements AfterViewInit {
     this.searchTextChanged.next(inputElement.value);
   }
 
-  getImagemUsuario(): any {
+  getImagemUsuario(): void {
     if (isPlatformBrowser(this.platformId)) {
       const emailLogado = sessionStorage.getItem('emailLogado');
-      const dadosUsuariosLocais = localStorage.getItem('dadosUsuariosLocais');
 
-      if (emailLogado && dadosUsuariosLocais) {
-        const dadosUsuarios = JSON.parse(dadosUsuariosLocais);
-        return dadosUsuarios[emailLogado];
+      if (emailLogado) {
+        this.authService.getUserByEmail(emailLogado).subscribe({
+          next: (user) => {
+            this.usuarioImagem = user.photo || null;
+            this.usuarioNome = user.username;
+            console.log(this.usuarioImagem)
+          },
+          error: (err) => {
+            console.error('Erro ao buscar dados do usuário:', err);
+            this.usuarioImagem = null;
+          },
+        });
       }
     }
-    return null;
   }
 
   signOut(): void {
