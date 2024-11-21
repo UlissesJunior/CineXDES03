@@ -4,11 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OmdbApiService } from '@services/omdb-api.service';
 import { OMDbMovie } from '@services/models/omdbTypes';
 import { FavoritesService } from '@services/favorites.service';
+import { RatingsService } from '@services/avaliacoes.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-movie-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './movie-details.component.html',
   styleUrls: ['./movie-details.component.scss']
 })
@@ -16,12 +18,15 @@ export class MovieDetailsComponent {
   movie: OMDbMovie | null = null;  
   loading = true;                  
   isFavorite = false;              
+  userRating: number | null = null; 
+  editingRating = false;           
 
   constructor(
     private route: ActivatedRoute, 
     private omdbApiService: OmdbApiService, 
     private router: Router,
-    private favoritesService: FavoritesService // Serviço de favoritos
+    private favoritesService: FavoritesService, 
+    private ratingsService: RatingsService // Injeção do serviço de avaliações
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +48,7 @@ export class MovieDetailsComponent {
             this.movie = res;
             this.loading = false;
             this.checkIfFavorite(emailLogado); 
+            this.loadUserRating(emailLogado); 
           }
         },
         error: (error: any) => {
@@ -66,6 +72,34 @@ export class MovieDetailsComponent {
       },
       error: (error) => {
         console.error('Erro ao verificar favoritos:', error);
+      }
+    });
+  }
+
+  loadUserRating(email: string): void {
+    if (!this.movie?.imdbID) return;
+
+    this.ratingsService.getRating(email, this.movie.imdbID).subscribe({
+      next: (rating: any) => {
+        this.userRating = rating.rating;
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar avaliação:', error);
+      }
+    });
+  }
+
+  saveRating(newRating: number): void {
+    const emailLogado = sessionStorage.getItem('emailLogado');
+    if (!emailLogado || !this.movie?.imdbID) return;
+
+    this.ratingsService.saveRating(emailLogado, this.movie.imdbID, newRating).subscribe({
+      next: () => {
+        this.userRating = newRating;
+        this.editingRating = false;
+      },
+      error: (error: any) => {
+        console.error('Erro ao salvar avaliação:', error);
       }
     });
   }
@@ -101,7 +135,6 @@ export class MovieDetailsComponent {
     }, 3000); 
   }
 
-  // Função para retornar a classe CSS apropriada para a estrela
   getStarClass(star: number): string {
     if (star === 1) {
       return 'bi bi-star-fill'; 
@@ -112,7 +145,6 @@ export class MovieDetailsComponent {
     }
   }
 
-  // Função para gerar um array representando as estrelas
   getStarsArray(): number[] {
     const maxStars = 5;
 

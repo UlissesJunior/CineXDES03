@@ -13,7 +13,6 @@ app.listen(3000, () => {
   console.log('Servidor na porta 3000');
 });
 
-// Helper function to save database changes
 function saveDatabase() {
   fs.writeFileSync(dbPath, JSON.stringify(dbUsuario, null, 2));
 }
@@ -34,7 +33,6 @@ app.get('/user', (req, res) => {
     res.status(200).json(usuario);
 });
 
-// Login endpoint
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
   const usuario = dbUsuario.find((usuario) => usuario.email === email);
@@ -78,12 +76,10 @@ app.post('/create', (req, res) => {
 const favoritosPath = path.resolve(__dirname, './database/favoritos.json');
 let dbFavoritos = require(favoritosPath);
 
-// Helper function to save favorites changes
 function saveFavoritos() {
   fs.writeFileSync(favoritosPath, JSON.stringify(dbFavoritos, null, 2));
 }
 
-// Get user favorites
 app.get('/favorites', (req, res) => {
   const { email } = req.query;
 
@@ -123,7 +119,6 @@ app.put('/favorites', (req, res) => {
   }
 });
 
-// Remove a favorite
 app.delete('/favorites', (req, res) => {
   const { email, imdbID } = req.body;
 
@@ -143,5 +138,56 @@ app.delete('/favorites', (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao remover favorito.' });
+  }
+});
+
+const avaliacaoPath = path.resolve(__dirname, './database/avaliacoes.json');
+let dbAvaliacao = require(avaliacaoPath);
+
+function saveAvaliacao() {
+  fs.writeFileSync(avaliacaoPath, JSON.stringify(dbAvaliacao, null, 2));
+}
+
+app.get('/ratings', (req, res) => {
+  const { email, imdbID } = req.query;
+
+  if (!email || !imdbID) {
+    return res.status(400).json({ message: 'Email ou imdbID não fornecido.' });
+  }
+
+  const userRating = dbAvaliacao[email]?.find((rating) => rating.imdbID === imdbID);
+
+  if (!userRating) {
+    return res.status(404).json({ message: 'Avaliação não encontrada.' });
+  }
+
+  res.status(200).json(userRating);
+});
+
+app.put('/ratings', (req, res) => {
+  const { email, imdbID, rating } = req.body;
+
+  if (!email || !imdbID || rating == null || rating < 0 || rating > 5) {
+    return res.status(400).json({ message: 'Dados inválidos.' });
+  }
+
+  if (!dbAvaliacao[email]) {
+    dbAvaliacao[email] = [];
+  }
+
+  const existingRatingIndex = dbAvaliacao[email].findIndex((r) => r.imdbID === imdbID);
+
+  if (existingRatingIndex >= 0) {
+    dbAvaliacao[email][existingRatingIndex].rating = rating;
+  } else {
+    dbAvaliacao[email].push({ imdbID, rating });
+  }
+
+  try {
+    saveAvaliacao();
+    res.status(200).json({ message: 'Avaliação salva com sucesso.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erro ao salvar avaliação.' });
   }
 });
